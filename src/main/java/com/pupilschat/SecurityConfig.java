@@ -18,9 +18,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for REST APIs
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login").permitAll() // the login door is open!
-                        .anyRequest().authenticated() // Lock down everything else
-                )
+                        // Open the login door, the WebSocket endpoint, and all web UI files
+                        .requestMatchers("/api/auth/login", "/ws/**", "/index.html", "/", "/*.js", "/*.css").permitAll()
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
