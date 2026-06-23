@@ -1,0 +1,18 @@
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# VS Code specific folders
+.vscode/
+
+# Maven build directory
+target/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+#
+.metals/
