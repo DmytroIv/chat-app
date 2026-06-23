@@ -4,13 +4,14 @@ public class Message {
     private String sender;
     private String content;
 
+    public Message() {
+    }
+
     public Message(String sender, String content) {
         this.sender = sender;
         this.content = content;
     }
 
-    // Getters and Setters are required by Spring Boot to convert this to JSON
-    // automatically!
     public String getSender() {
         return sender;
     }

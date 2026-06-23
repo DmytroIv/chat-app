@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
-    private static final String URL = "jdbc:postgresql://localhost:5432/chatdb";
+    private static final String URL = "jdbc:postgresql://localhost:5433/chatdb";
     private static final String USER = "chatuser";
     private static final String PASSWORD = "chatpassword";
 
