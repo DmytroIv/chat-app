@@ -24,9 +24,16 @@ public class ClientHandler implements Runnable {
             // Add the writer to the server's set of writers
             ChatServer.addWriter(out);
 
+            // get the client's IP to store it in the db
+            String clientAddress = clientSocket.getInetAddress().getHostAddress();
+
             String message;
             while ((message = reader.readLine()) != null) {
                 System.out.println("Received: " + message);
+                // save the message to the DB
+                DatabaseManager.saveMessage(clientAddress, message);
+
+                // broadcast the message
                 ChatServer.broadcast("Users message: " + message);
             }
 
