@@ -14,6 +14,7 @@ public class ChatServer {
 
     public static void main(String[] args) {
         int port = 12345;
+        DatabaseManager.initializeDatabase(); // Initialize the database when the server starts
 
         try {
             ServerSocket serverSocket = new ServerSocket(port);
