@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class ChatClient {
     public static void main(String[] args) {
         String serverAddress = "127.0.0.1";
-        int port = 12345;
+        int port = 9090;
 
         try {
             Socket socket = new Socket(serverAddress, port);

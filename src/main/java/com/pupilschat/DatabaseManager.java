@@ -5,6 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseManager {
     private static final String URL = "jdbc:postgresql://localhost:5432/chatdb";
@@ -52,5 +55,28 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.err.println("Failed to save message to DB: " + e.getMessage());
         }
+    }
+
+    //
+    public static List<Message> getAllMessages() {
+        List<Message> messages = new ArrayList<>();
+        String querySQL = "SELECT sender_address, message_content FROM messages ORDER BY created_at ASC";
+
+        try (Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(querySQL)) {
+
+            while (rs.next()) {
+                String sender = rs.getString("sender_address");
+                String content = rs.getString("message_content");
+
+                messages.add(new Message(sender, content));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Failed to fetch messages from DB: " + e.getMessage());
+        }
+
+        return messages;
     }
 }

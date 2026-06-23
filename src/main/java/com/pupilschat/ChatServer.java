@@ -1,5 +1,8 @@
 package com.pupilschat;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -8,12 +11,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+@SpringBootApplication
 public class ChatServer {
 
     private static Set<PrintWriter> clientWriters = Collections.synchronizedSet(new HashSet<>());
 
     public static void main(String[] args) {
-        int port = 12345;
+        SpringApplication.run(ChatServer.class, args);
+
+        int port = 9090;
         DatabaseManager.initializeDatabase(); // Initialize the database when the server starts
 
         try {
