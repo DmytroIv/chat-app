@@ -7,37 +7,55 @@ async function login() {
     currentUser = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
 
-    // Hit our AuthController
     const response = await fetch(`/api/auth/login?username=${currentUser}&password=${pass}`, { method: 'POST' });
     const text = await response.text();
 
     if (text.includes("SUCCESS")) {
-        // Extract the token from the Java response string
         jwtToken = text.split('\n')[1].trim(); 
         
-        // Swap the UI
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('chat-screen').style.display = 'block';
         
-        // Connect to the real-time stream!
+        // Fetch the historical messages before turning on the live stream!
+        await fetchChatHistory();
+
         connectWebSocket();
     } else {
         document.getElementById('error-msg').style.display = 'block';
     }
 }
 
+// Grab the history from PostgreSQL via the REST API
+async function fetchChatHistory() {
+    try {
+        const response = await fetch('/api/messages', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + jwtToken // Show our VIP pass!
+            }
+        });
+
+        if (response.ok) {
+            const messages = await response.json();
+            // Loop through the database records and paint them on the screen
+            messages.forEach(msg => {
+                displayMessage(msg.sender, msg.content);
+            });
+        }
+    } catch (error) {
+        console.error("Failed to load chat history:", error);
+    }
+}
+
 // 2. Connect to the STOMP WebSocket
 function connectWebSocket() {
-    const socket = new SockJS('/ws'); // Matches our WebSocketConfig endpoint
+    const socket = new SockJS('/ws'); 
     stompClient = Stomp.over(socket);
-    
-    // Turn off massive debug logs in the browser console
     stompClient.debug = null; 
 
     stompClient.connect({}, function (frame) {
         console.log('Connected to WebSockets!');
         
-        // Subscribe to the RabbitMQ broadcast channel
         stompClient.subscribe('/topic/messages', function (message) {
             const parsedMessage = JSON.parse(message.body);
             displayMessage(parsedMessage.sender, parsedMessage.content);
@@ -45,7 +63,7 @@ function connectWebSocket() {
     });
 }
 
-// 3. Send a message to the REST API (which forwards to RabbitMQ)
+// 3. Send a message to the REST API
 async function sendMessage() {
     const inputField = document.getElementById('message-input');
     const content = inputField.value.trim();
@@ -57,12 +75,12 @@ async function sendMessage() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + jwtToken // Show our VIP pass!
+                'Authorization': 'Bearer ' + jwtToken 
             },
             body: JSON.stringify(messageObj)
         });
 
-        inputField.value = ''; // Clear the input box
+        inputField.value = ''; 
     }
 }
 
@@ -74,10 +92,9 @@ function displayMessage(sender, content) {
     msgDiv.innerHTML = `<span class="sender">${sender}:</span> ${content}`;
     
     chatBox.appendChild(msgDiv);
-    chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+    chatBox.scrollTop = chatBox.scrollHeight; 
 }
 
-// Listen for the "Enter" key to send messages easily
 document.getElementById("message-input").addEventListener("keypress", function(event) {
     if (event.key === "Enter") {
         event.preventDefault();
