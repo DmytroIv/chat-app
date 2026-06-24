@@ -100,7 +100,6 @@ async function switchRoom(roomName) {
 
 async function fetchChatHistory() {
     try {
-        // Ask the API for messages specifically from the 'currentRoom'
         const response = await fetch(`/api/messages/${currentRoom}`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + jwtToken }
@@ -108,7 +107,7 @@ async function fetchChatHistory() {
 
         if (response.ok) {
             const messages = await response.json();
-            messages.forEach(msg => { displayMessage(msg.sender, msg.content); });
+            messages.forEach(msg => { displayMessage(msg.sender, msg.content, msg.timestamp); });
         }
     } catch (error) {
         console.error("Failed to load chat history:", error);
@@ -130,10 +129,9 @@ function connectWebSocket() {
 }
 
 function subscribeToCurrentRoom() {
-    // Subscribe to the dynamic STOMP topic created by our Java MessageConsumer
     currentSubscription = stompClient.subscribe(`/topic/${currentRoom}`, function (message) {
         const parsedMessage = JSON.parse(message.body);
-        displayMessage(parsedMessage.sender, parsedMessage.content);
+        displayMessage(parsedMessage.sender, parsedMessage.content, parsedMessage.timestamp);
     });
 }
 
@@ -158,11 +156,14 @@ async function sendMessage() {
     }
 }
 
-function displayMessage(sender, content) {
+function displayMessage(sender, content, timestamp) {
     const chatBox = document.getElementById('chat-box');
     const msgDiv = document.createElement('div');
     msgDiv.className = 'message';
-    msgDiv.innerHTML = `<span class="sender">${sender}:</span> ${content}`;
+    
+    const timeHtml = timestamp ? `<span class="timestamp">[${timestamp}]</span>` : '';
+    
+    msgDiv.innerHTML = `${timeHtml} <span class="sender">${sender}:</span> ${content}`;
     
     chatBox.appendChild(msgDiv);
     chatBox.scrollTop = chatBox.scrollHeight; 

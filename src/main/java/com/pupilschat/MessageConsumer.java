@@ -13,22 +13,25 @@ public class MessageConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
     public void consumeMessageFromQueue(String payload) {
-        System.out.println("RabbitMQ routing message: " + payload);
+        System.out.println("📦 RabbitMQ routing message: " + payload);
+
         String[] parts = payload.split("\\|\\|\\|");
-        if (parts.length == 3) {
+
+        if (parts.length == 4) {
             String room = parts[0];
             String sender = parts[1];
             String content = parts[2];
+            String time = parts[3];
 
             DatabaseManager.saveMessage(room, sender, content);
 
-            Message outMessage = new Message(room, sender, content);
+            Message outMessage = new Message(room, sender, content, time);
             messagingTemplate.convertAndSend("/topic/" + room, outMessage);
 
-            System.out.println("Successfully broadcasted to /topic/" + room);
+            System.out.println("✅ Successfully broadcasted to /topic/" + room);
         } else {
-            System.err.println(
-                    "ERROR: Invalid payload received! Expected 3 parts but got: " + parts.length + " -> " + payload);
+            System.err
+                    .println("❌ ERROR: Invalid payload! Expected 4 parts but got: " + parts.length + " -> " + payload);
         }
     }
 }

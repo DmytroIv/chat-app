@@ -56,7 +56,8 @@ public class DatabaseManager {
 
     public static List<Message> getMessagesByRoom(String room) {
         List<Message> messages = new ArrayList<>();
-        String querySQL = "SELECT room, sender_address, message_content FROM messages WHERE room = ? ORDER BY created_at ASC";
+        // HH:mm - DD/MM/YYYY
+        String querySQL = "SELECT room, sender_address, message_content, TO_CHAR(created_at, 'HH24:MI - DD/MM/YYYY') as msg_time FROM messages WHERE room = ? ORDER BY created_at ASC";
 
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(querySQL)) {
@@ -67,7 +68,9 @@ public class DatabaseManager {
                     String dbRoom = rs.getString("room");
                     String sender = rs.getString("sender_address");
                     String content = rs.getString("message_content");
-                    messages.add(new Message(dbRoom, sender, content));
+                    String time = rs.getString("msg_time");
+
+                    messages.add(new Message(dbRoom, sender, content, time));
                 }
             }
         } catch (SQLException e) {

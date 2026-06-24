@@ -9,7 +9,7 @@ button:hover { background-color: #1d4ed8; }
 .error { color: red; text-align: center; display: none; margin-top: 10px; }
 
 /* Main App Layout */
-.app-container { display: flex; width: 800px; height: 500px; background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow: hidden; }
+.app-container { display: flex; max-width: 90vw; min-width: 50vw; height: 500px; background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow: hidden; }
 
 /* Sidebar */
 .sidebar { width: 250px; background-color: #1e293b; color: white; padding: 20px; box-sizing: border-box; }
@@ -25,6 +25,7 @@ button:hover { background-color: #1d4ed8; }
 #chat-box { flex-grow: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
 .message { padding: 10px 15px; background-color: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); align-self: flex-start; max-width: 80%; }
 .sender { font-weight: bold; color: #2563eb; margin-right: 5px; }
+.timestamp { font-size: 11px; color: #94a3b8; margin-right: 8px; font-family: monospace; white-space: nowrap; }
 
 /* Input Area */
 .input-area { display: flex; gap: 10px; }

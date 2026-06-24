@@ -4,6 +4,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -20,8 +22,12 @@ public class MessageController {
 
     @PostMapping
     public String receiveWebMessage(@RequestBody Message incomingMessage) {
-        String payload = incomingMessage.getRoom() + "|||" + incomingMessage.getSender() + "|||"
-                + incomingMessage.getContent();
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm - dd/MM/yyyy"));
+
+        String payload = incomingMessage.getRoom() + "|||" +
+                incomingMessage.getSender() + "|||" +
+                incomingMessage.getContent() + "|||" +
+                time;
 
         rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_NAME, payload);
         return "Message successfully sent to RabbitMQ!";

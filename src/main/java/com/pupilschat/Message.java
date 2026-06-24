@@ -4,14 +4,17 @@ public class Message {
     private String room;
     private String sender;
     private String content;
+    private String timestamp;
 
     public Message() {
     }
 
-    public Message(String room, String sender, String content) {
+    // NEW Constructor
+    public Message(String room, String sender, String content, String timestamp) {
         this.room = room;
         this.sender = sender;
         this.content = content;
+        this.timestamp = timestamp;
     }
 
     public String getRoom() {
@@ -36,5 +39,13 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 }
