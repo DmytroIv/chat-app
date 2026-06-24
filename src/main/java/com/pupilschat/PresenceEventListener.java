@@ -3,7 +3,8 @@ package com.pupilschat;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
@@ -11,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
+@RestController
 public class PresenceEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
@@ -21,12 +22,15 @@ public class PresenceEventListener {
         this.messagingTemplate = messagingTemplate;
     }
 
+    @GetMapping("/api/presence")
+    public Set<String> getActiveUsers() {
+        return Set.copyOf(sessionUserMap.values());
+    }
+
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = accessor.getSessionId();
-
-        // Extract the custom 'username' header we will send from JavaScript
         String username = accessor.getFirstNativeHeader("username");
 
         if (username != null) {
@@ -40,8 +44,6 @@ public class PresenceEventListener {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = accessor.getSessionId();
 
-        // If the session disconnects (e.g., closing the tab), remove them and broadcast
-        // the update
         if (sessionUserMap.containsKey(sessionId)) {
             sessionUserMap.remove(sessionId);
             broadcastPresence();
@@ -49,10 +51,7 @@ public class PresenceEventListener {
     }
 
     private void broadcastPresence() {
-        // Grab the unique list of online users
         Set<String> uniqueUsers = Set.copyOf(sessionUserMap.values());
-
-        // Broadcast the list to a new global channel: /topic/presence
         messagingTemplate.convertAndSend("/topic/presence", uniqueUsers);
     }
 }

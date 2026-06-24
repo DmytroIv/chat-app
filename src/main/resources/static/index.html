@@ -27,15 +27,19 @@
         <!-- SIDEBAR -->
         <div class="sidebar">
             <h3>Pupils Channels</h3>
+            <h3>new channel 
+                <button onclick="createNewChannel()" style="background-color: #3b82f6; border: none; color: white; padding: 2px 8px; float: right; cursor: pointer; border-radius: 4px;">➕</button>
+            </h3>
             <ul id="channel-list">
                 <li class="active" onclick="switchRoom('general')"># general</li>
-                <li onclick="switchRoom('engineering')"># engineering</li>
-                <li onclick="switchRoom('random')"># random</li>
             </ul>
             <!--  -->
             <hr style="border-color: #334155; margin: 20px 0; border-width: 1px; border-style: solid;">
             <h3>online users</h3>
             <ul id="online-users-list"></ul>
+            
+            <hr style="border-color: #334155; margin: 20px 0; border-width: 1px; border-style: solid;">
+            <button onclick="logout()" style="background-color: #ef4444; width: 100%; margin-top: 30px;">Logout</button>
         </div>
 
         <!-- CHAT AREA -->

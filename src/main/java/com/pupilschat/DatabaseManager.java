@@ -32,6 +32,11 @@ public class DatabaseManager {
                     "username VARCHAR(50) PRIMARY KEY, " +
                     "password VARCHAR(255) NOT NULL)");
 
+            stmt.execute("CREATE TABLE IF NOT EXISTS channels (name VARCHAR(50) PRIMARY KEY)");
+
+            // always present a default general channel
+            stmt.execute("INSERT INTO channels (name) VALUES ('general') ON CONFLICT DO NOTHING");
+
             System.out.println("Database initialized and tables are ready.");
         } catch (SQLException e) {
             System.err.println("Database initialization failed: " + e.getMessage());
@@ -52,6 +57,33 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.err.println("Failed to save message to DB: " + e.getMessage());
         }
+    }
+
+    public static boolean createChannel(String name) {
+        String insertSQL = "INSERT INTO channels (name) VALUES (?)";
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
+            pstmt.setString(1, name.toLowerCase().replaceAll("[^a-z0-9_]", ""));
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public static List<String> getAllChannels() {
+        List<String> channels = new ArrayList<>();
+        String querySQL = "SELECT name FROM channels ORDER BY name ASC";
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(querySQL);
+                ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                channels.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to fetch channels: " + e.getMessage());
+        }
+        return channels;
     }
 
     public static List<Message> getMessagesByRoom(String room) {
