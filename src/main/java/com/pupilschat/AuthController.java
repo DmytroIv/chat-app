@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -13,11 +14,32 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @PostMapping("/register")
+    public String register(@RequestParam String username, @RequestParam String password) {
+        // Prevent duplicate usernames
+        if (DatabaseManager.getUserPassword(username) != null) {
+            return "ERROR: Username already exists!";
+        }
+
+        // Hash the password securely using BCrypt before saving!
+        String hashedPassword = passwordEncoder.encode(password);
+        boolean success = DatabaseManager.createUser(username, hashedPassword);
+
+        if (success) {
+            return "SUCCESS: User registered! You can now log in.";
+        }
+        return "ERROR: Database error during registration.";
+    }
+
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password) {
 
-        // TODO Hardcoded
-        if ("admin".equals(username) && "password".equals(password)) {
+        String storedHash = DatabaseManager.getUserPassword(username);
+
+        if (storedHash != null && passwordEncoder.matches(password, storedHash)) {
             String token = jwtUtil.generateToken(username);
             return "SUCCESS! Your JWT Token is: \n" + token;
         }

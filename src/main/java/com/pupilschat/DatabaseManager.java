@@ -1,22 +1,14 @@
 package com.pupilschat;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
-    private static final String DB_HOST = System.getenv().getOrDefault("DB_HOST", "localhost");
-    private static final String DB_PORT = System.getenv().getOrDefault("DB_PORT", "5433");
-    private static final String DB_NAME = System.getenv().getOrDefault("DB_NAME", "chatdb");
-
-    private static final String URL = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME;
-    private static final String USER = System.getenv().getOrDefault("DB_USER", "chatuser");
-    private static final String PASSWORD = System.getenv().getOrDefault("DB_PASS", "chatpassword");
+    private static final String URL = System.getenv().getOrDefault("SPRING_DATASOURCE_URL",
+            "jdbc:postgresql://localhost:5433/chatdb");
+    private static final String USER = System.getenv().getOrDefault("SPRING_DATASOURCE_USERNAME", "chatuser");
+    private static final String PASSWORD = System.getenv().getOrDefault("SPRING_DATASOURCE_PASSWORD", "chatpassword");
 
     // connect to the db
     public static Connection getConnection() throws SQLException {
@@ -34,16 +26,18 @@ public class DatabaseManager {
                     "message_content TEXT, " +
                     "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
-            // NEW: Safely upgrade our existing table to support rooms!
             stmt.execute("ALTER TABLE messages ADD COLUMN IF NOT EXISTS room VARCHAR(50) DEFAULT 'general'");
 
-            System.out.println("Database initialized and 'messages' table is ready.");
+            stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
+                    "username VARCHAR(50) PRIMARY KEY, " +
+                    "password VARCHAR(255) NOT NULL)");
+
+            System.out.println("Database initialized and tables are ready.");
         } catch (SQLException e) {
             System.err.println("Database initialization failed: " + e.getMessage());
         }
     }
 
-    // save a new message into the database
     public static void saveMessage(String room, String sender, String content) {
         String insertSQL = "INSERT INTO messages (room, sender_address, message_content) VALUES (?, ?, ?)";
 
@@ -60,7 +54,6 @@ public class DatabaseManager {
         }
     }
 
-    //
     public static List<Message> getMessagesByRoom(String room) {
         List<Message> messages = new ArrayList<>();
         String querySQL = "SELECT room, sender_address, message_content FROM messages WHERE room = ? ORDER BY created_at ASC";
@@ -81,5 +74,35 @@ public class DatabaseManager {
             System.err.println("Failed to fetch messages: " + e.getMessage());
         }
         return messages;
+    }
+
+    public static boolean createUser(String username, String password) {
+        String insertSQL = "INSERT INTO users (username, password) VALUES (?, ?)";
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Failed to create user: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public static String getUserPassword(String username) {
+        String querySQL = "SELECT password FROM users WHERE username = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(querySQL)) {
+            pstmt.setString(1, username);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("password");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Failed to fetch user: " + e.getMessage());
+        }
+        return null; // Not found
     }
 }

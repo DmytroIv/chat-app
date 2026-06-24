@@ -4,22 +4,72 @@ let currentUser = null;
 let currentRoom = 'general'; // Default room
 let currentSubscription = null;
 
+// Utility function to display messages on the login screen
+function showAuthMessage(msg, isError) {
+    const errorMsg = document.getElementById('error-msg');
+    const successMsg = document.getElementById('success-msg');
+    
+    if (isError) {
+        errorMsg.innerText = msg;
+        errorMsg.style.display = 'block';
+        successMsg.style.display = 'none';
+    } else {
+        successMsg.innerText = msg;
+        successMsg.style.display = 'block';
+        errorMsg.style.display = 'none';
+    }
+}
+
+// Register a new user
+async function register() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+
+    if (!user || !pass) {
+        showAuthMessage("Username and password required!", true);
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/auth/register?username=${user}&password=${pass}`, { method: 'POST' });
+        const text = await response.text();
+
+        if (text.includes("SUCCESS")) {
+            showAuthMessage(text, false);
+        } else {
+            showAuthMessage(text, true);
+        }
+    } catch (error) {
+        showAuthMessage("Registration failed to reach the server.", true);
+    }
+}
+
+// Refactored login to use our new message logic
 async function login() {
     currentUser = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
 
-    const response = await fetch(`/api/auth/login?username=${currentUser}&password=${pass}`, { method: 'POST' });
-    const text = await response.text();
+    if (!currentUser || !pass) {
+        showAuthMessage("Username and password required!", true);
+        return;
+    }
 
-    if (text.includes("SUCCESS")) {
-        jwtToken = text.split('\n')[1].trim(); 
-        
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app-screen').style.display = 'flex'; // Use flex for our split layout
-        
-        connectWebSocket();
-    } else {
-        document.getElementById('error-msg').style.display = 'block';
+    try {
+        const response = await fetch(`/api/auth/login?username=${currentUser}&password=${pass}`, { method: 'POST' });
+        const text = await response.text();
+
+        if (text.includes("SUCCESS")) {
+            jwtToken = text.split('\n')[1].trim(); 
+            
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'flex'; // Use flex for our split layout
+            
+            connectWebSocket();
+        } else {
+            showAuthMessage("Invalid credentials", true);
+        }
+    } catch (error) {
+        showAuthMessage("Login failed to reach the server.", true);
     }
 }
 
@@ -92,7 +142,7 @@ async function sendMessage() {
     const content = inputField.value.trim();
 
     if (content && jwtToken) {
-        // Package the currentRoom into the JSON payload!
+        // Package the currentRoom into the JSON payload
         const messageObj = { room: currentRoom, sender: currentUser, content: content };
 
         await fetch('/api/messages', {

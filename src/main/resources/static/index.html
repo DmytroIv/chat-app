@@ -10,16 +10,18 @@
 <body>
 
 
-    <!-- LOGIN SCREEN -->
+    <!-- LOGIN / REGISTER SCREEN -->
     <div id="login-screen" class="container">
         <h2>Security Gateway</h2>
-        <input type="text" id="username" placeholder="Username" value="admin">
-        <input type="password" id="password" placeholder="Password" value="password">
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
         <button onclick="login()">Authenticate</button>
-        <p id="error-msg" class="error">Invalid credentials</p>
+        <button onclick="register()" style="background-color: #10b981; margin-top: 10px;">Register New User</button>
+        <p id="error-msg" class="error"></p>
+        <p id="success-msg" style="color: green; text-align: center; display: none; margin-top: 10px;"></p>
     </div>
 
-    <!-- MAIN APP DASHBOARD -->
+    <!-- MAIN APP DASHBOARD (Hidden until logged in) -->
     <div id="app-screen" class="app-container" style="display:none;">
         
         <!-- SIDEBAR -->

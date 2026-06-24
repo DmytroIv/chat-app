@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class SecurityConfig {
@@ -14,12 +16,21 @@ public class SecurityConfig {
     private JwtFilter jwtFilter;
 
     @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for REST APIs
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Open the login door, the WebSocket endpoint, and all web UI files
-                        .requestMatchers("/api/auth/login", "/ws/**", "/index.html", "/", "/*.js", "/*.css").permitAll()
+                        // Specific matchers MUST come first!
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/ws/**", "/index.html", "/", "/*.js",
+                                "/*.css")
+                        .permitAll()
+
+                        // anyRequest() MUST be the absolute last item in the list!
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

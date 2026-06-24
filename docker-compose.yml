@@ -28,23 +28,22 @@ services:
 
   # THE JAVA APPLICATION
   chat-api:
-    build: . # Tells Docker to look for the 'Dockerfile' in this folder
+    build: . 
     container_name: chat-spring-api
+    restart: on-failure
     ports:
       - "8088:8088"
     depends_on:
       - db
       - rabbitmq
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_NAME: chatdb
-      DB_USER: chatuser
-      DB_PASS: chatpassword
-      RMQ_HOST: rabbitmq
-      RMQ_PORT: 5672
-      RMQ_USER: guest
-      RMQ_PASS: guest
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/chatdb
+      SPRING_DATASOURCE_USERNAME: chatuser
+      SPRING_DATASOURCE_PASSWORD: chatpassword
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
 
 volumes:
   pgdata:
