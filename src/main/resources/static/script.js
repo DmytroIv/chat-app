@@ -115,16 +115,32 @@ async function fetchChatHistory() {
 }
 
 function connectWebSocket() {
-    const socket = new SockJS('/ws'); 
+const socket = new SockJS('/ws'); 
     stompClient = Stomp.over(socket);
     stompClient.debug = null; 
 
-    stompClient.connect({}, async function (frame) {
+    stompClient.connect({ 'username': currentUser }, async function (frame) {
         console.log('Connected to WebSockets!');
         
-        // Load history and subscribe to the default room immediately after connecting
+        stompClient.subscribe('/topic/presence', function (message) {
+            const activeUsers = JSON.parse(message.body);
+            updatePresenceList(activeUsers);
+        });
+
         await fetchChatHistory();
         subscribeToCurrentRoom();
+    });
+}
+
+function updatePresenceList(users) {
+    const list = document.getElementById('online-users-list');
+    list.innerHTML = '';
+    
+    users.forEach(user => {
+        const li = document.createElement('li');
+        li.style.cursor = 'default';
+        li.innerHTML = `<span style="color: #10b981; margin-right: 8px;">●</span> ${user}`;
+        list.appendChild(li);
     });
 }
 
