@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # THE DATABASE
   db:
     image: postgres:15-alpine
     container_name: chat-postgres
@@ -14,6 +15,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  # THE MESSAGE BROKER
   rabbitmq:
     image: rabbitmq:3-management
     container_name: chat-rabbitmq
@@ -23,6 +25,26 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+
+  # THE JAVA APPLICATION
+  chat-api:
+    build: . # Tells Docker to look for the 'Dockerfile' in this folder
+    container_name: chat-spring-api
+    ports:
+      - "8088:8088"
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: chatdb
+      DB_USER: chatuser
+      DB_PASS: chatpassword
+      RMQ_HOST: rabbitmq
+      RMQ_PORT: 5672
+      RMQ_USER: guest
+      RMQ_PASS: guest
 
 volumes:
   pgdata:

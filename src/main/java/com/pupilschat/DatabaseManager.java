@@ -10,9 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
-    private static final String URL = "jdbc:postgresql://localhost:5433/chatdb";
-    private static final String USER = "chatuser";
-    private static final String PASSWORD = "chatpassword";
+    private static final String DB_HOST = System.getenv().getOrDefault("DB_HOST", "localhost");
+    private static final String DB_PORT = System.getenv().getOrDefault("DB_PORT", "5433");
+    private static final String DB_NAME = System.getenv().getOrDefault("DB_NAME", "chatdb");
+
+    private static final String URL = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME;
+    private static final String USER = System.getenv().getOrDefault("DB_USER", "chatuser");
+    private static final String PASSWORD = System.getenv().getOrDefault("DB_PASS", "chatpassword");
 
     // connect to the db
     public static Connection getConnection() throws SQLException {
