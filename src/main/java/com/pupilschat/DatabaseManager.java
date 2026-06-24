@@ -21,35 +21,34 @@ public class DatabaseManager {
 
     // create a new messages table
     public static void initializeDatabase() {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS messages ("
-                + "id SERIAL PRIMARY KEY, "
-                + "sender_address VARCHAR(50), "
-                + "message_content TEXT NOT NULL, "
-                + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
-                + ");";
-
-        // 'try-with-resources' automatically closes the connection when done
         try (Connection conn = getConnection();
                 Statement stmt = conn.createStatement()) {
 
-            stmt.execute(createTableSQL);
-            System.out.println("Database initialized and 'messages' table is ready.");
+            stmt.execute("CREATE TABLE IF NOT EXISTS messages (" +
+                    "id SERIAL PRIMARY KEY, " +
+                    "sender_address VARCHAR(255), " +
+                    "message_content TEXT, " +
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
+            // NEW: Safely upgrade our existing table to support rooms!
+            stmt.execute("ALTER TABLE messages ADD COLUMN IF NOT EXISTS room VARCHAR(50) DEFAULT 'general'");
+
+            System.out.println("Database initialized and 'messages' table is ready.");
         } catch (SQLException e) {
             System.err.println("Database initialization failed: " + e.getMessage());
         }
     }
 
     // save a new message into the database
-    public static void saveMessage(String senderAddress, String content) {
-        String insertSQL = "INSERT INTO messages (sender_address, message_content) VALUES (?, ?)";
+    public static void saveMessage(String room, String sender, String content) {
+        String insertSQL = "INSERT INTO messages (room, sender_address, message_content) VALUES (?, ?, ?)";
 
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
 
-            // using PreparedStatement to prevent SQL Injection attacks
-            pstmt.setString(1, senderAddress);
-            pstmt.setString(2, content);
+            pstmt.setString(1, room);
+            pstmt.setString(2, sender);
+            pstmt.setString(3, content);
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -58,25 +57,25 @@ public class DatabaseManager {
     }
 
     //
-    public static List<Message> getAllMessages() {
+    public static List<Message> getMessagesByRoom(String room) {
         List<Message> messages = new ArrayList<>();
-        String querySQL = "SELECT sender_address, message_content FROM messages ORDER BY created_at ASC";
+        String querySQL = "SELECT room, sender_address, message_content FROM messages WHERE room = ? ORDER BY created_at ASC";
 
         try (Connection conn = getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(querySQL)) {
+                PreparedStatement pstmt = conn.prepareStatement(querySQL)) {
 
-            while (rs.next()) {
-                String sender = rs.getString("sender_address");
-                String content = rs.getString("message_content");
-
-                messages.add(new Message(sender, content));
+            pstmt.setString(1, room);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String dbRoom = rs.getString("room");
+                    String sender = rs.getString("sender_address");
+                    String content = rs.getString("message_content");
+                    messages.add(new Message(dbRoom, sender, content));
+                }
             }
-
         } catch (SQLException e) {
-            System.err.println("Failed to fetch messages from DB: " + e.getMessage());
+            System.err.println("Failed to fetch messages: " + e.getMessage());
         }
-
         return messages;
     }
 }

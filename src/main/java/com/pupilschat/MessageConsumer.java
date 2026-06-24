@@ -13,20 +13,20 @@ public class MessageConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
     public void consumeMessageFromQueue(String payload) {
-        System.out.println("📦 RabbitMQ Consumer grabbed a message: " + payload);
+        System.out.println("📦 RabbitMQ routing message: " + payload);
 
-        // Unpack the string payload
+        // Split into 3 parts (Room, Sender, Content)
         String[] parts = payload.split("\\|\\|\\|");
-        if (parts.length == 2) {
-            String sender = parts[0];
-            String content = parts[1];
+        if (parts.length == 3) {
+            String room = parts[0];
+            String sender = parts[1];
+            String content = parts[2];
 
-            // 1. Save it to our PostgreSQL Database
-            DatabaseManager.saveMessage(sender, content);
+            DatabaseManager.saveMessage(room, sender, content);
 
-            // 2. Broadcast it to all connected TCP Desktop Clients
-            Message outMessage = new Message(sender, content);
-            messagingTemplate.convertAndSend("/topic/messages", outMessage);
+            // Route to a dynamic STOMP topic based on the room name!
+            Message outMessage = new Message(room, sender, content);
+            messagingTemplate.convertAndSend("/topic/" + room, outMessage);
         }
     }
 }

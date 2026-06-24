@@ -9,21 +9,39 @@
 </head>
 <body>
 
+
+    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="container">
         <h2>Security Gateway</h2>
         <input type="text" id="username" placeholder="Username" value="admin">
         <input type="password" id="password" placeholder="Password" value="password">
-        <button onclick="login()">Authenticate & Connect</button>
-        <p id="error-msg" style="color:red; text-align:center; display:none;">Invalid credentials</p>
+        <button onclick="login()">Authenticate</button>
+        <p id="error-msg" class="error">Invalid credentials</p>
     </div>
 
-    <div id="chat-screen" class="container" style="display:none; width: 600px;">
-        <h2>Global Chat Stream</h2>
-        <div id="chat-box"></div>
-        <div style="display: flex; gap: 10px;">
-            <input type="text" id="message-input" placeholder="Type a secure message...">
-            <button onclick="sendMessage()" style="width: 100px;">Send</button>
+    <!-- MAIN APP DASHBOARD -->
+    <div id="app-screen" class="app-container" style="display:none;">
+        
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <h3>Pupils Channels</h3>
+            <ul id="channel-list">
+                <li class="active" onclick="switchRoom('general')"># general</li>
+                <li onclick="switchRoom('engineering')"># engineering</li>
+                <li onclick="switchRoom('random')"># random</li>
+            </ul>
         </div>
+
+        <!-- CHAT AREA -->
+        <div class="chat-area">
+            <h2 id="current-room-title"># general</h2>
+            <div id="chat-box"></div>
+            <div class="input-area">
+                <input type="text" id="message-input" placeholder="Message channel...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
     </div>
 
     <script src="/script.js"></script>
