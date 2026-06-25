@@ -10,10 +10,8 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    // For local dev, generating a secure random key on startup.
     private final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    // The token will expire in 10 hours
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10;
 
     public String generateToken(String username) {

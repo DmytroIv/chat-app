@@ -23,23 +23,20 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        // look for the "Authorization" header in the incoming web request
         final String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;
         String jwt = null;
 
-        // the industry standard is to prefix the token with "Bearer "
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (Exception e) {
-                System.out.println("Invalid or Expired JWT Token");
+                System.err.println("Invalid or Expired JWT Token");
             }
         }
 
-        // if the token is valid, tell Spring Security this user is authenticated!
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtUtil.validateToken(jwt)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null,
@@ -48,7 +45,6 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
-        // pass the request further down the chain
         chain.doFilter(request, response);
     }
 }

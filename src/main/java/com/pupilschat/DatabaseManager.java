@@ -10,12 +10,10 @@ public class DatabaseManager {
     private static final String USER = System.getenv().getOrDefault("SPRING_DATASOURCE_USERNAME", "chatuser");
     private static final String PASSWORD = System.getenv().getOrDefault("SPRING_DATASOURCE_PASSWORD", "chatpassword");
 
-    // connect to the db
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-    // create a new messages table
     public static void initializeDatabase() {
         try (Connection conn = getConnection();
                 Statement stmt = conn.createStatement()) {
@@ -34,10 +32,8 @@ public class DatabaseManager {
 
             stmt.execute("CREATE TABLE IF NOT EXISTS channels (name VARCHAR(50) PRIMARY KEY)");
 
-            // always present a default general channel
             stmt.execute("INSERT INTO channels (name) VALUES ('general') ON CONFLICT DO NOTHING");
 
-            System.out.println("Database initialized and tables are ready.");
         } catch (SQLException e) {
             System.err.println("Database initialization failed: " + e.getMessage());
         }
@@ -138,6 +134,6 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.err.println("Failed to fetch user: " + e.getMessage());
         }
-        return null; // Not found
+        return null;
     }
 }

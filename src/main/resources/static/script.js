@@ -141,8 +141,6 @@ function connectWebSocket() {
   stompClient.debug = null;
 
   stompClient.connect({ username: currentUser }, async function (frame) {
-    console.log("Connected to WebSockets!");
-
     stompClient.subscribe("/topic/presence", function (message) {
       const activeUsers = JSON.parse(message.body);
       updatePresenceList(activeUsers);

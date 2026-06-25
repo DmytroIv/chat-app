@@ -1,59 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Pupils Chat Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <link rel="stylesheet" href="/style.css">
-</head>
-<body>
-
-
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
     <!-- LOGIN / REGISTER SCREEN -->
     <div id="login-screen" class="container">
-        <h2>Security Gateway</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Authenticate</button>
-        <button onclick="register()" style="background-color: #10b981; margin-top: 10px;">Register New User</button>
-        <p id="error-msg" class="error"></p>
-        <p id="success-msg" style="color: green; text-align: center; display: none; margin-top: 10px;"></p>
+      <h2>Security Gateway</h2>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Authenticate</button>
+      <button
+        onclick="register()"
+        style="background-color: #10b981; margin-top: 10px"
+      >
+        Register New User
+      </button>
+      <p id="error-msg" class="error"></p>
+      <p
+        id="success-msg"
+        style="
+          color: green;
+          text-align: center;
+          display: none;
+          margin-top: 10px;
+        "
+      ></p>
     </div>
 
     <!-- MAIN APP DASHBOARD (Hidden until logged in) -->
-    <div id="app-screen" class="app-container" style="display:none;">
-        
-        <!-- SIDEBAR -->
-        <div class="sidebar">
-            <h3>Pupils Channels</h3>
-            <h3>new channel 
-                <button onclick="createNewChannel()" style="background-color: #3b82f6; border: none; color: white; padding: 2px 8px; float: right; cursor: pointer; border-radius: 4px;">➕</button>
-            </h3>
-            <ul id="channel-list">
-                <li class="active" onclick="switchRoom('general')"># general</li>
-            </ul>
-            <!--  -->
-            <hr style="border-color: #334155; margin: 20px 0; border-width: 1px; border-style: solid;">
-            <h3>online users</h3>
-            <ul id="online-users-list"></ul>
-            
-            <hr style="border-color: #334155; margin: 20px 0; border-width: 1px; border-style: solid;">
-            <button onclick="logout()" style="background-color: #ef4444; width: 100%; margin-top: 30px;">Logout</button>
-        </div>
+    <div id="app-screen" class="app-container" style="display: none">
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <h3>Pupils Channels</h3>
+        <h3>
+          new channel
+          <button
+            onclick="createNewChannel()"
+            style="
+              background-color: #3b82f6;
+              border: none;
+              color: white;
+              padding: 2px 8px;
+              float: right;
+              cursor: pointer;
+              border-radius: 4px;
+            "
+          >
+            ➕
+          </button>
+        </h3>
+        <ul id="channel-list">
+          <li class="active" onclick="switchRoom('general')"># general</li>
+        </ul>
+        <!--  -->
+        <hr
+          style="
+            border-color: #334155;
+            margin: 20px 0;
+            border-width: 1px;
+            border-style: solid;
+          "
+        />
+        <h3>online users</h3>
+        <ul id="online-users-list"></ul>
 
-        <!-- CHAT AREA -->
-        <div class="chat-area">
-            <h2 id="current-room-title"># general</h2>
-            <div id="chat-box"></div>
-            <div class="input-area">
-                <input type="text" id="message-input" placeholder="Message channel...">
-                <button onclick="sendMessage()">Send</button>
-            </div>
-        </div>
+        <hr
+          style="
+            border-color: #334155;
+            margin: 20px 0;
+            border-width: 1px;
+            border-style: solid;
+          "
+        />
+        <button
+          onclick="logout()"
+          style="background-color: #ef4444; width: 100%; margin-top: 30px"
+        >
+          Logout
+        </button>
+      </div>
 
+      <!-- CHAT AREA -->
+      <div class="chat-area">
+        <h2 id="current-room-title"># general</h2>
+        <div id="chat-box"></div>
+        <div class="input-area">
+          <input
+            type="text"
+            id="message-input"
+            placeholder="Message channel..."
+          />
+          <button onclick="sendMessage()">Send</button>
+        </div>
+      </div>
     </div>
 
     <script src="/script.js"></script>
-</body>
+  </body>
 </html>

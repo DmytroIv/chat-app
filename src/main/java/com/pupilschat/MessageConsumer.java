@@ -13,7 +13,6 @@ public class MessageConsumer {
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
     public void consumeMessageFromQueue(String payload) {
-        System.out.println("📦 RabbitMQ routing message: " + payload);
 
         String[] parts = payload.split("\\|\\|\\|");
 
@@ -28,7 +27,6 @@ public class MessageConsumer {
             Message outMessage = new Message(room, sender, content, time);
             messagingTemplate.convertAndSend("/topic/" + room, outMessage);
 
-            System.out.println("✅ Successfully broadcasted to /topic/" + room);
         } else {
             System.err
                     .println("❌ ERROR: Invalid payload! Expected 4 parts but got: " + parts.length + " -> " + payload);

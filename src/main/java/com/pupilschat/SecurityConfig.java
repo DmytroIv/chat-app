@@ -25,12 +25,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Specific matchers MUST come first!
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/ws/**", "/index.html", "/", "/*.js",
                                 "/*.css")
                         .permitAll()
 
-                        // anyRequest() MUST be the absolute last item in the list!
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

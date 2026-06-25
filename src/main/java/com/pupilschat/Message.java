@@ -9,7 +9,6 @@ public class Message {
     public Message() {
     }
 
-    // NEW Constructor
     public Message(String room, String sender, String content, String timestamp) {
         this.room = room;
         this.sender = sender;

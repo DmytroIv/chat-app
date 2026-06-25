@@ -19,12 +19,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public String register(@RequestParam String username, @RequestParam String password) {
-        // Prevent duplicate usernames
         if (DatabaseManager.getUserPassword(username) != null) {
             return "ERROR: Username already exists!";
         }
 
-        // Hash the password securely using BCrypt before saving!
         String hashedPassword = passwordEncoder.encode(password);
         boolean success = DatabaseManager.createUser(username, hashedPassword);
 
