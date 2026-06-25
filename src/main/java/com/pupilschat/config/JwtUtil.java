@@ -1,4 +1,4 @@
-package com.pupilschat;
+package com.pupilschat.config;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

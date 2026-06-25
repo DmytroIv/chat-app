@@ -1,8 +1,10 @@
-package com.pupilschat;
+package com.pupilschat.service;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.pupilschat.model.Message;
 
 public class DatabaseManager {
     private static final String URL = System.getenv().getOrDefault("SPRING_DATASOURCE_URL",

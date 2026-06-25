@@ -1,4 +1,4 @@
-package com.pupilschat;
+package com.pupilschat.config;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;

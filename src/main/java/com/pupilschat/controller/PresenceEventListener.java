@@ -1,4 +1,4 @@
-package com.pupilschat;
+package com.pupilschat.controller;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

@@ -1,4 +1,4 @@
-package com.pupilschat;
+package com.pupilschat.model;
 
 public class Message {
     private String room;

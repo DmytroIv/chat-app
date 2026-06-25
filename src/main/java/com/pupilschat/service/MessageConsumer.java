@@ -1,9 +1,12 @@
-package com.pupilschat;
+package com.pupilschat.service;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+
+import com.pupilschat.config.RabbitMQConfig;
+import com.pupilschat.model.Message;
 
 @Component
 public class MessageConsumer {

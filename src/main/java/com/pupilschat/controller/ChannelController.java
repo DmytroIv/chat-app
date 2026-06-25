@@ -1,8 +1,10 @@
-package com.pupilschat;
+package com.pupilschat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import com.pupilschat.service.DatabaseManager;
 
 import java.util.List;
 
